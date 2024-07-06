@@ -27,8 +27,8 @@ use syn::spanned::Spanned;
 use syn::token::Comma;
 use syn::Lit;
 use syn::{
-    Expr, Generics, Ident, ItemEnum, ItemFn, ItemMod, ItemStruct, LitInt, PatType, Token, Type,
-    TypePath,
+    Expr, Generics, Ident, ItemEnum, ItemFn, ItemMod, ItemStruct, LitInt, PatType, Path, Token,
+    Type, TypePath,
 };
 
 #[derive(Debug)]
@@ -66,8 +66,8 @@ pub struct Ix {
     pub docs: Option<Vec<String>>,
     pub args: Vec<IxArg>,
     pub returns: IxReturn,
-    // The ident for the struct deriving Accounts.
-    pub anchor_ident: Ident,
+    // The path for the struct deriving Accounts.
+    pub anchor_path: Path,
     // The discriminator based on the `#[interface]` attribute.
     // TODO: Remove and use `overrides`
     pub interface_discriminator: Option<[u8; 8]>,

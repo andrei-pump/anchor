@@ -1,5 +1,5 @@
 use crate::parser::docs;
-use crate::parser::program::ctx_accounts_ident;
+use crate::parser::program::{ctx_accounts_ident, ctx_accounts_path};
 use crate::parser::spl_interface;
 use crate::{FallbackFn, Ix, IxArg, IxReturn, Overrides};
 use syn::parse::{Error as ParseError, Result as ParseResult};
@@ -29,13 +29,13 @@ pub fn parse(program_mod: &syn::ItemMod) -> ParseResult<(Vec<Ix>, Option<Fallbac
             let interface_discriminator = spl_interface::parse(&method.attrs);
             let docs = docs::parse(&method.attrs);
             let returns = parse_return(method)?;
-            let anchor_ident = ctx_accounts_ident(&ctx.raw_arg)?;
+            let anchor_path = ctx_accounts_path(&ctx.raw_arg)?;
             Ok(Ix {
                 raw_method: method.clone(),
                 ident: method.sig.ident.clone(),
                 docs,
                 args,
-                anchor_ident,
+                anchor_path,
                 returns,
                 interface_discriminator,
                 overrides,

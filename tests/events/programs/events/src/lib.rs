@@ -1,6 +1,8 @@
 //! This example demonstrates how to emit an event, which can be
 //! subscribed to by a client.
 
+mod initialize;
+
 use anchor_lang::prelude::*;
 
 declare_id!("2dhGsWUzy5YKUsjZdLHLmkNpUDAXkNa9MYWsPc4Ziqzy");
@@ -8,12 +10,9 @@ declare_id!("2dhGsWUzy5YKUsjZdLHLmkNpUDAXkNa9MYWsPc4Ziqzy");
 #[program]
 pub mod events {
     use super::*;
-    pub fn initialize(_ctx: Context<Initialize>) -> Result<()> {
-        emit!(MyEvent {
-            data: 5,
-            label: "hello".to_string(),
-        });
-        Ok(())
+    use crate::initialize::init_event;
+    pub fn initialize(_ctx: Context<initialize::hehe::Initialize2>) -> Result<()> {
+        init_event()
     }
 
     pub fn test_event(_ctx: Context<TestEvent>) -> Result<()> {
@@ -32,9 +31,6 @@ pub mod events {
         Ok(())
     }
 }
-
-#[derive(Accounts)]
-pub struct Initialize {}
 
 #[derive(Accounts)]
 pub struct TestEvent {}

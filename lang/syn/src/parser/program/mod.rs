@@ -2,6 +2,7 @@ use crate::parser::docs;
 use crate::Program;
 use syn::parse::{Error as ParseError, Result as ParseResult};
 use syn::spanned::Spanned;
+use syn::Path;
 
 mod instructions;
 
@@ -17,7 +18,7 @@ pub fn parse(program_mod: syn::ItemMod) -> ParseResult<Program> {
     })
 }
 
-fn ctx_accounts_ident(path_ty: &syn::PatType) -> ParseResult<proc_macro2::Ident> {
+fn ctx_accounts_path(path_ty: &syn::PatType) -> ParseResult<Path> {
     let p = match &*path_ty.ty {
         syn::Type::Path(p) => &p.path,
         _ => return Err(ParseError::new(path_ty.ty.span(), "invalid type")),
@@ -50,5 +51,11 @@ fn ctx_accounts_ident(path_ty: &syn::PatType) -> ParseResult<proc_macro2::Ident>
             ))
         }
     };
+    // eprintln!("path!!!{path:?}");
+    Ok(path.clone())
+}
+
+fn ctx_accounts_ident(path_ty: &syn::PatType) -> ParseResult<proc_macro2::Ident> {
+    let path = ctx_accounts_path(path_ty)?;
     Ok(path.segments[0].ident.clone())
 }

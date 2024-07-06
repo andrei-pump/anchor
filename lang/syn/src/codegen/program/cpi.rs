@@ -9,7 +9,7 @@ pub fn generate(program: &Program) -> proc_macro2::TokenStream {
         .ixs
         .iter()
         .map(|ix| {
-            let accounts_ident: proc_macro2::TokenStream = format!("crate::cpi::accounts::{}", &ix.anchor_ident.to_string()).parse().unwrap();
+            let anchor_path = ix.anchor_path.clone();
             let cpi_method = {
                 let ix_variant = generate_ix_variant(ix.raw_method.sig.ident.to_string(), &ix.args);
                 let method_name = &ix.ident;
@@ -29,7 +29,7 @@ pub fn generate(program: &Program) -> proc_macro2::TokenStream {
 
                 quote! {
                     pub fn #method_name<'a, 'b, 'c, 'info>(
-                        ctx: anchor_lang::context::CpiContext<'a, 'b, 'c, 'info, #accounts_ident<'info>>,
+                        ctx: anchor_lang::context::CpiContext<'a, 'b, 'c, 'info, #anchor_path<'info>>,
                         #(#args),*
                     ) -> #method_ret {
                         let ix = {
@@ -95,7 +95,7 @@ pub fn generate_accounts(program: &Program) -> proc_macro2::TokenStream {
 
     // Go through instruction accounts.
     for ix in &program.ixs {
-        let anchor_ident = &ix.anchor_ident;
+        let anchor_ident = &ix.anchor_path.segments[0].ident;
         // TODO: move to fn and share with accounts.rs.
         let macro_name = format!(
             "__cpi_client_accounts_{}",

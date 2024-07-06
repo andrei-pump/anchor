@@ -31,7 +31,7 @@ pub fn gen_idl_print_fn_program(program: &Program) -> TokenStream {
         .flat_map(|ix| -> Result<_> {
             let name = ix.ident.to_string();
             let name_pascal = format_ident!("{}", name.to_camel_case());
-            let ctx_ident = &ix.anchor_ident;
+            let ctx_path = &ix.anchor_path;
 
             let docs = match &ix.docs {
                 Some(docs) if !no_docs => quote! { vec![#(#docs.into()),*] },
@@ -78,7 +78,7 @@ pub fn gen_idl_print_fn_program(program: &Program) -> TokenStream {
                         name: #name.into(),
                         docs: #docs,
                         discriminator: crate::instruction::#name_pascal::DISCRIMINATOR.into(),
-                        accounts: #ctx_ident::__anchor_private_gen_idl_accounts(
+                        accounts: #ctx_path::__anchor_private_gen_idl_accounts(
                             &mut accounts,
                             &mut types,
                         ),
