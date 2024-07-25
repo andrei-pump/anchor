@@ -9,10 +9,10 @@ use solana_program::instruction::AccountMeta;
 use solana_program::pubkey::Pubkey;
 use std::collections::BTreeSet;
 
-impl<'info, B> Accounts<'info, B> for AccountInfo<'info> {
+impl<'a, 'info, B> Accounts<'a, 'info, B> for AccountInfo<'info> {
     fn try_accounts(
         _program_id: &Pubkey,
-        accounts: &mut &[AccountInfo<'info>],
+        accounts: &mut &'a [AccountInfo<'info>],
         _ix_data: &[u8],
         _bumps: &mut B,
         _reallocs: &mut BTreeSet<Pubkey>,

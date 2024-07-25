@@ -20,10 +20,10 @@ use solana_program::pubkey::Pubkey;
 use std::collections::BTreeSet;
 use std::ops::Deref;
 
-impl<'info, B, T: Accounts<'info, B>> Accounts<'info, B> for Box<T> {
+impl<'a, 'info, B, T: Accounts<'a, 'info, B>> Accounts<'a, 'info, B> for Box<T> {
     fn try_accounts(
         program_id: &Pubkey,
-        accounts: &mut &'info [AccountInfo<'info>],
+        accounts: &mut &'a [AccountInfo<'info>],
         ix_data: &[u8],
         bumps: &mut B,
         reallocs: &mut BTreeSet<Pubkey>,

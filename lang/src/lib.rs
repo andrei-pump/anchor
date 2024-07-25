@@ -102,7 +102,7 @@ pub type Result<T> = std::result::Result<T, error::Error>;
 ///     pub pda_1: u8,
 /// }
 /// ```
-pub trait Accounts<'info, B>: ToAccountMetas + ToAccountInfos<'info> + Sized {
+pub trait Accounts<'a, 'info, B>: ToAccountMetas + ToAccountInfos<'info> + Sized {
     /// Returns the validated accounts struct. What constitutes "valid" is
     /// program dependent. However, users of these types should never have to
     /// worry about account substitution attacks. For example, if a program
@@ -116,7 +116,7 @@ pub trait Accounts<'info, B>: ToAccountMetas + ToAccountInfos<'info> + Sized {
     /// so that it cannot be used again.
     fn try_accounts(
         program_id: &Pubkey,
-        accounts: &mut &'info [AccountInfo<'info>],
+        accounts: &mut &'a [AccountInfo<'info>],
         ix_data: &[u8],
         bumps: &mut B,
         reallocs: &mut BTreeSet<Pubkey>,

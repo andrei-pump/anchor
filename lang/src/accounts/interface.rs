@@ -73,19 +73,19 @@ use std::ops::Deref;
 /// - [`TokenInterface`](https://docs.rs/anchor-spl/latest/anchor_spl/token_interface/struct.TokenInterface.html)
 ///
 #[derive(Clone)]
-pub struct Interface<'info, T>(Program<'info, T>);
-impl<'a, T> Interface<'a, T> {
-    pub(crate) fn new(info: &'a AccountInfo<'a>) -> Self {
+pub struct Interface<'a, 'info, T>(Program<'a, 'info, T>);
+impl<'a, 'info, T> Interface<'a, 'info, T> {
+    pub(crate) fn new(info: &'a AccountInfo<'info>) -> Self {
         Self(Program::new(info))
     }
     pub fn programdata_address(&self) -> Result<Option<Pubkey>> {
         self.0.programdata_address()
     }
 }
-impl<'a, T: CheckId> TryFrom<&'a AccountInfo<'a>> for Interface<'a, T> {
+impl<'a, 'info, T: CheckId> TryFrom<&'a AccountInfo<'info>> for Interface<'a, 'info, T> {
     type Error = Error;
     /// Deserializes the given `info` into a `Program`.
-    fn try_from(info: &'a AccountInfo<'a>) -> Result<Self> {
+    fn try_from(info: &'a AccountInfo<'info>) -> Result<Self> {
         T::check_id(info.key)?;
         if !info.executable {
             return Err(ErrorCode::InvalidProgramExecutable.into());
@@ -93,23 +93,23 @@ impl<'a, T: CheckId> TryFrom<&'a AccountInfo<'a>> for Interface<'a, T> {
         Ok(Self::new(info))
     }
 }
-impl<'info, T> Deref for Interface<'info, T> {
+impl<'a, 'info, T> Deref for Interface<'a, 'info, T> {
     type Target = AccountInfo<'info>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
-impl<'info, T> AsRef<AccountInfo<'info>> for Interface<'info, T> {
+impl<'a, 'info, T> AsRef<AccountInfo<'info>> for Interface<'a, 'info, T> {
     fn as_ref(&self) -> &AccountInfo<'info> {
         &self.0
     }
 }
 
-impl<'info, B, T: CheckId> Accounts<'info, B> for Interface<'info, T> {
+impl<'a, 'info, B, T: CheckId> Accounts<'a, 'info, B> for Interface<'a, 'info, T> {
     #[inline(never)]
     fn try_accounts(
         _program_id: &Pubkey,
-        accounts: &mut &'info [AccountInfo<'info>],
+        accounts: &mut &'a [AccountInfo<'info>],
         _ix_data: &[u8],
         _bumps: &mut B,
         _reallocs: &mut BTreeSet<Pubkey>,
@@ -123,21 +123,21 @@ impl<'info, B, T: CheckId> Accounts<'info, B> for Interface<'info, T> {
     }
 }
 
-impl<'info, T> ToAccountMetas for Interface<'info, T> {
+impl<'a, 'info, T> ToAccountMetas for Interface<'a, 'info, T> {
     fn to_account_metas(&self, is_signer: Option<bool>) -> Vec<AccountMeta> {
         self.0.to_account_metas(is_signer)
     }
 }
 
-impl<'info, T> ToAccountInfos<'info> for Interface<'info, T> {
+impl<'a, 'info, T> ToAccountInfos<'info> for Interface<'a, 'info, T> {
     fn to_account_infos(&self) -> Vec<AccountInfo<'info>> {
         self.0.to_account_infos()
     }
 }
 
-impl<'info, T: AccountDeserialize> AccountsExit<'info> for Interface<'info, T> {}
+impl<'a, 'info, T: AccountDeserialize> AccountsExit<'info> for Interface<'a, 'info, T> {}
 
-impl<'info, T: AccountDeserialize> Key for Interface<'info, T> {
+impl<'a, 'info, T: AccountDeserialize> Key for Interface<'a, 'info, T> {
     fn key(&self) -> Pubkey {
         self.0.key()
     }

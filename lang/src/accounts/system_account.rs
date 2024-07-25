@@ -11,17 +11,17 @@ use std::ops::Deref;
 ///
 /// - `SystemAccount.info.owner == SystemProgram`
 #[derive(Debug, Clone)]
-pub struct SystemAccount<'info> {
-    info: &'info AccountInfo<'info>,
+pub struct SystemAccount<'a, 'info> {
+    info: &'a AccountInfo<'info>,
 }
 
-impl<'info> SystemAccount<'info> {
-    fn new(info: &'info AccountInfo<'info>) -> SystemAccount<'info> {
+impl<'a, 'info> SystemAccount<'a, 'info> {
+    fn new(info: &'a AccountInfo<'info>) -> SystemAccount<'a, 'info> {
         Self { info }
     }
 
     #[inline(never)]
-    pub fn try_from(info: &'info AccountInfo<'info>) -> Result<SystemAccount<'info>> {
+    pub fn try_from(info: &'a AccountInfo<'info>) -> Result<SystemAccount<'a, 'info>> {
         if *info.owner != system_program::ID {
             return Err(ErrorCode::AccountNotSystemOwned.into());
         }
@@ -29,11 +29,11 @@ impl<'info> SystemAccount<'info> {
     }
 }
 
-impl<'info, B> Accounts<'info, B> for SystemAccount<'info> {
+impl<'a, 'info, B> Accounts<'a, 'info, B> for SystemAccount<'a, 'info> {
     #[inline(never)]
     fn try_accounts(
         _program_id: &Pubkey,
-        accounts: &mut &'info [AccountInfo<'info>],
+        accounts: &mut &'a [AccountInfo<'info>],
         _ix_data: &[u8],
         _bumps: &mut B,
         _reallocs: &mut BTreeSet<Pubkey>,
@@ -47,9 +47,9 @@ impl<'info, B> Accounts<'info, B> for SystemAccount<'info> {
     }
 }
 
-impl<'info> AccountsExit<'info> for SystemAccount<'info> {}
+impl<'a, 'info> AccountsExit<'info> for SystemAccount<'a, 'info> {}
 
-impl<'info> ToAccountMetas for SystemAccount<'info> {
+impl<'a, 'info> ToAccountMetas for SystemAccount<'a, 'info> {
     fn to_account_metas(&self, is_signer: Option<bool>) -> Vec<AccountMeta> {
         let is_signer = is_signer.unwrap_or(self.info.is_signer);
         let meta = match self.info.is_writable {
@@ -60,19 +60,19 @@ impl<'info> ToAccountMetas for SystemAccount<'info> {
     }
 }
 
-impl<'info> ToAccountInfos<'info> for SystemAccount<'info> {
+impl<'a, 'info> ToAccountInfos<'info> for SystemAccount<'a, 'info> {
     fn to_account_infos(&self) -> Vec<AccountInfo<'info>> {
         vec![self.info.clone()]
     }
 }
 
-impl<'info> AsRef<AccountInfo<'info>> for SystemAccount<'info> {
+impl<'a, 'info> AsRef<AccountInfo<'info>> for SystemAccount<'a, 'info> {
     fn as_ref(&self) -> &AccountInfo<'info> {
         self.info
     }
 }
 
-impl<'info> Deref for SystemAccount<'info> {
+impl<'a, 'info> Deref for SystemAccount<'a, 'info> {
     type Target = AccountInfo<'info>;
 
     fn deref(&self) -> &Self::Target {
@@ -80,7 +80,7 @@ impl<'info> Deref for SystemAccount<'info> {
     }
 }
 
-impl<'info> Key for SystemAccount<'info> {
+impl<'a, 'info> Key for SystemAccount<'a, 'info> {
     fn key(&self) -> Pubkey {
         *self.info.key
     }

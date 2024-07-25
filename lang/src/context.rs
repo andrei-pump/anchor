@@ -50,9 +50,9 @@ where
     }
 }
 
-impl<'a, 'b, 'c, 'info, T> Context<'a, 'b, 'c, 'info, T>
+impl<'x, 'a, 'b, 'c, 'info, T> Context<'a, 'b, 'c, 'info, T>
 where
-    T: Bumps + Accounts<'info, T::Bumps>,
+    T: Bumps + Accounts<'x, 'info, T::Bumps>,
 {
     pub fn new(
         program_id: &'a Pubkey,

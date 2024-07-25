@@ -30,12 +30,12 @@ use std::ops::{Deref, DerefMut};
 ///     let clock = Clock::get()?;
 /// }
 /// ```
-pub struct Sysvar<'info, T: solana_program::sysvar::Sysvar> {
-    info: &'info AccountInfo<'info>,
+pub struct Sysvar<'a, 'info, T: solana_program::sysvar::Sysvar> {
+    info: &'a AccountInfo<'info>,
     account: T,
 }
 
-impl<'info, T: solana_program::sysvar::Sysvar + fmt::Debug> fmt::Debug for Sysvar<'info, T> {
+impl<'a, 'info, T: solana_program::sysvar::Sysvar + fmt::Debug> fmt::Debug for Sysvar<'a, 'info, T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Sysvar")
             .field("info", &self.info)
@@ -44,8 +44,8 @@ impl<'info, T: solana_program::sysvar::Sysvar + fmt::Debug> fmt::Debug for Sysva
     }
 }
 
-impl<'info, T: solana_program::sysvar::Sysvar> Sysvar<'info, T> {
-    pub fn from_account_info(acc_info: &'info AccountInfo<'info>) -> Result<Sysvar<'info, T>> {
+impl<'a, 'info, T: solana_program::sysvar::Sysvar> Sysvar<'a, 'info, T> {
+    pub fn from_account_info(acc_info: &'a AccountInfo<'info>) -> Result<Sysvar<'a, 'info, T>> {
         match T::from_account_info(acc_info) {
             Ok(val) => Ok(Sysvar {
                 info: acc_info,
@@ -56,7 +56,7 @@ impl<'info, T: solana_program::sysvar::Sysvar> Sysvar<'info, T> {
     }
 }
 
-impl<'info, T: solana_program::sysvar::Sysvar> Clone for Sysvar<'info, T> {
+impl<'a, 'info, T: solana_program::sysvar::Sysvar> Clone for Sysvar<'a, 'info, T> {
     fn clone(&self) -> Self {
         Self {
             info: self.info,
@@ -65,10 +65,10 @@ impl<'info, T: solana_program::sysvar::Sysvar> Clone for Sysvar<'info, T> {
     }
 }
 
-impl<'info, B, T: solana_program::sysvar::Sysvar> Accounts<'info, B> for Sysvar<'info, T> {
+impl<'a, 'info, B, T: solana_program::sysvar::Sysvar> Accounts<'a, 'info, B> for Sysvar<'a, 'info, T> {
     fn try_accounts(
         _program_id: &Pubkey,
-        accounts: &mut &'info [AccountInfo<'info>],
+        accounts: &mut &'a [AccountInfo<'info>],
         _ix_data: &[u8],
         _bumps: &mut B,
         _reallocs: &mut BTreeSet<Pubkey>,
@@ -82,25 +82,25 @@ impl<'info, B, T: solana_program::sysvar::Sysvar> Accounts<'info, B> for Sysvar<
     }
 }
 
-impl<'info, T: solana_program::sysvar::Sysvar> ToAccountMetas for Sysvar<'info, T> {
+impl<'a, 'info, T: solana_program::sysvar::Sysvar> ToAccountMetas for Sysvar<'a, 'info, T> {
     fn to_account_metas(&self, _is_signer: Option<bool>) -> Vec<AccountMeta> {
         vec![AccountMeta::new_readonly(*self.info.key, false)]
     }
 }
 
-impl<'info, T: solana_program::sysvar::Sysvar> ToAccountInfos<'info> for Sysvar<'info, T> {
+impl<'a, 'info, T: solana_program::sysvar::Sysvar> ToAccountInfos<'info> for Sysvar<'a, 'info, T> {
     fn to_account_infos(&self) -> Vec<AccountInfo<'info>> {
         vec![self.info.clone()]
     }
 }
 
-impl<'info, T: solana_program::sysvar::Sysvar> AsRef<AccountInfo<'info>> for Sysvar<'info, T> {
+impl<'a, 'info, T: solana_program::sysvar::Sysvar> AsRef<AccountInfo<'info>> for Sysvar<'a, 'info, T> {
     fn as_ref(&self) -> &AccountInfo<'info> {
         self.info
     }
 }
 
-impl<'a, T: solana_program::sysvar::Sysvar> Deref for Sysvar<'a, T> {
+impl<'a, 'info, T: solana_program::sysvar::Sysvar> Deref for Sysvar<'a, 'info, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
@@ -108,15 +108,15 @@ impl<'a, T: solana_program::sysvar::Sysvar> Deref for Sysvar<'a, T> {
     }
 }
 
-impl<'a, T: solana_program::sysvar::Sysvar> DerefMut for Sysvar<'a, T> {
+impl<'a, 'info, T: solana_program::sysvar::Sysvar> DerefMut for Sysvar<'a, 'info, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.account
     }
 }
 
-impl<'info, T: solana_program::sysvar::Sysvar> AccountsExit<'info> for Sysvar<'info, T> {}
+impl<'a, 'info, T: solana_program::sysvar::Sysvar> AccountsExit<'info> for Sysvar<'a, 'info, T> {}
 
-impl<'info, T: solana_program::sysvar::Sysvar> Key for Sysvar<'info, T> {
+impl<'a, 'info, T: solana_program::sysvar::Sysvar> Key for Sysvar<'a, 'info, T> {
     fn key(&self) -> Pubkey {
         *self.info.key
     }
